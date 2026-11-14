@@ -1,0 +1,171 @@
+/* ==========================================================================
+   1. ESTILOS PERSONALIZADOS PARA CUADRÍCULAS, TÁCTIL Y MODO CONCENTRACIÓN
+   ========================================================================== */
+body {
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+}
+
+.wordsearch-cell {
+    user-select: none;
+    -webkit-user-select: none;
+    touch-action: none;
+    transition: transform 0.1s ease, background-color 0.15s ease, color 0.15s ease;
+}
+
+@media (hover: hover) {
+    .wordsearch-cell:hover {
+        transform: scale(1.06);
+        z-index: 10;
+    }
+}
+
+.crossword-cell-input {
+    caret-color: transparent;
+    text-transform: uppercase;
+}
+
+.crossword-cell-input:focus {
+    outline: none;
+}
+
+/* Input invisible pero funcional para invocar el teclado virtual en móviles */
+.mobile-hidden-input {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 0;
+    z-index: -1;
+}
+
+/* Modo Concentración / Pantalla Completa para proyección en aula (TV / Video Beam) */
+body.focus-mode #wsGridContainer {
+    max-width: 680px !important;
+}
+
+/* Scrollbars sutiles */
+::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+::-webkit-scrollbar-track {
+    background: #f1f5f9;
+    border-radius: 8px;
+}
+.dark ::-webkit-scrollbar-track {
+    background: #1e293b;
+}
+::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 8px;
+}
+.dark ::-webkit-scrollbar-thumb {
+    background: #475569;
+}
+::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8;
+}
+
+/* ==========================================================================
+   2. ESTILOS EXCLUSIVOS DE IMPRESIÓN (BLINDADOS CONTRA MODO OSCURO)
+   ========================================================================== */
+@media print {
+    @page {
+        margin: 12mm;
+    }
+    html, body {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+        overflow: visible !important;
+        height: auto !important;
+    }
+    .no-print {
+        display: none !important;
+    }
+    .print-only {
+        display: block !important;
+    }
+    .print-container {
+        box-shadow: none !important;
+        border: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        background: #ffffff !important;
+    }
+    .print-grid-wrapper,
+    .print-white-box {
+        box-shadow: none !important;
+        border-color: #cbd5e1 !important;
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #000000 !important;
+    }
+    /* Desactivar alturas máximas y recortes para mostrar todas las pistas completas */
+    #cwCluesAcross, #cwCluesDown {
+        max-height: none !important;
+        overflow: visible !important;
+        padding-right: 0 !important;
+    }
+    .clue-item-print {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        border-color: #cbd5e1 !important;
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+    }
+    .clue-text-print {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: unset !important;
+        color: #0f172a !important;
+    }
+    #wsWordList {
+        grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+        gap: 6px !important;
+    }
+    #wsWordList > div {
+        border-color: #cbd5e1 !important;
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        color: #0f172a !important;
+        white-space: normal !important;
+        overflow: visible !important;
+    }
+    #wsWordList span.truncate {
+        white-space: normal !important;
+        overflow: visible !important;
+        text-overflow: unset !important;
+        color: #0f172a !important;
+    }
+    #wsGridContainer {
+        max-width: 460px !important;
+        margin: 0 auto 16px auto !important;
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        border: 2px solid #0f172a !important;
+    }
+    /* Forzar fondo blanco y letra oscura en cada casilla de la sopa de letras aunque esté activo el tema oscuro */
+    .wordsearch-cell {
+        background: #ffffff !important;
+        background-color: #ffffff !important;
+        border: 1px solid #cbd5e1 !important;
+        color: #0f172a !important;
+    }
+    #cwGridWrapper {
+        background: #0f172a !important;
+        padding: 4px !important;
+        print-color-adjust: exact;
+        -webkit-print-color-adjust: exact;
+    }
+}
