@@ -1174,18 +1174,102 @@ function loadSavedActivity(id) {
     showToast(`${t('toastActivityLoaded')} "${act.name}"`, 'info');
 }
 
+function openPuzzleConfirmModal({ title, message, confirmText, cancelText, onConfirm }) {
+    const existing = document.getElementById('puzzleConfirmModalOverlay');
+    if (existing) existing.remove();
+
+    const isDark = document.documentElement.classList.contains('dark');
+    const cardBg = isDark ? '#0f172a' : '#ffffff';
+    const cardText = isDark ? '#f8fafc' : '#0f172a';
+    const descText = isDark ? '#cbd5e1' : '#475569';
+    const borderCol = isDark ? '#1e293b' : '#e2e8f0';
+    const cancelBg = isDark ? '#1e293b' : '#f1f5f9';
+    const cancelTextCol = isDark ? '#e2e8f0' : '#334155';
+
+    const overlay = document.createElement('div');
+    overlay.id = 'puzzleConfirmModalOverlay';
+    overlay.style.cssText = 'position:fixed;inset:0;background:rgba(15,23,42,0.65);backdrop-filter:blur(4px);z-index:200;display:flex;align-items:center;justify-content:center;padding:1rem;';
+
+    overlay.innerHTML = `
+        <div style="background:${cardBg};color:${cardText};border:1px solid ${borderCol};border-radius:1rem;padding:1.4rem;max-width:410px;width:100%;box-shadow:0 20px 35px -10px rgba(0,0,0,0.35);text-align:center;">
+            <div style="width:46px;height:46px;border-radius:999px;margin:0 auto 0.75rem;background:rgba(244,63,94,0.14);color:#e11d48;display:flex;align-items:center;justify-content:center;font-size:1.15rem;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <h3 style="font-size:1rem;font-weight:800;margin-bottom:0.45rem;">${title}</h3>
+            <p style="font-size:0.82rem;color:${descText};line-height:1.45;margin-bottom:1.15rem;">${message}</p>
+            <div style="display:flex;gap:0.55rem;justify-content:center;flex-wrap:wrap;">
+                <button type="button" id="btnPuzzleModalCancel" style="padding:0.5rem 0.95rem;border-radius:0.65rem;border:1px solid ${borderCol};background:${cancelBg};color:${cancelTextCol};font-size:0.78rem;font-weight:700;cursor:pointer;">
+                    ${cancelText}
+                </button>
+                <button type="button" id="btnPuzzleModalConfirm" style="padding:0.5rem 0.95rem;border-radius:0.65rem;border:none;background:#e11d48;color:#ffffff;font-size:0.78rem;font-weight:700;cursor:pointer;">
+                    ${confirmText}
+                </button>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(overlay);
+
+    const closeModalBox = () => overlay.remove();
+
+    overlay.querySelector('#btnPuzzleModalCancel').addEventListener('click', closeModalBox);
+    overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeModalBox();
+    });
+    overlay.querySelector('#btnPuzzleModalConfirm').addEventListener('click', () => {
+        closeModalBox();
+        if (typeof onConfirm === 'function') onConfirm();
+    });
+}
+
 function deleteSavedActivity(id) {
-    const activities = getSavedActivities().filter(a => a.id !== id);
-    setSavedActivities(activities);
-    showToast(t('toastActivityDeleted'), 'info');
+    const allActivities = getSavedActivities();
+    const target = allActivities.find(a => a.id === id);
+    if (!target) return;
+
+    const safeName = (target.name || t('untitledPuzzle')).replace(/</g, '<').replace(/>/g, '>');
+    const title = currentLang === 'en' ? 'Delete saved activity?' : '¿Eliminar actividad guardada?';
+    const message = currentLang === 'en'
+        ? `Are you sure you want to delete <strong>"${safeName}"</strong>?`
+        : `¿Seguro que deseas eliminar <strong>"${safeName}"</strong>?`;
+    const confirmText = currentLang === 'en' ? 'Yes, delete' : 'Sí, eliminar';
+    const cancelText = currentLang === 'en' ? 'Cancel' : 'Cancelar';
+
+    openPuzzleConfirmModal({
+        title,
+        message,
+        confirmText,
+        cancelText,
+        onConfirm: () => {
+            const updated = getSavedActivities().filter(a => a.id !== id);
+            setSavedActivities(updated);
+            showToast(t('toastActivityDeleted'), 'info');
+        }
+    });
 }
 
 function deleteAllSavedActivities() {
     const activities = getSavedActivities();
     if (activities.length === 0) return;
-    savedPagination.currentPage = 1;
-    setSavedActivities([]);
-    showToast(t('toastAllActivitiesCleared'), 'info');
+
+    const title = currentLang === 'en' ? 'Clear all saved activities?' : '¿Vaciar todas las actividades guardadas?';
+    const message = currentLang === 'en'
+        ? `This will permanently delete <strong>${activities.length}</strong> saved activity/activities.`
+        : `Esto eliminará de forma permanente <strong>${activities.length}</strong> actividad(es) guardada(s).`;
+    const confirmText = currentLang === 'en' ? 'Yes, clear all' : 'Sí, vaciar todo';
+    const cancelText = currentLang === 'en' ? 'Cancel' : 'Cancelar';
+
+    openPuzzleConfirmModal({
+        title,
+        message,
+        confirmText,
+        cancelText,
+        onConfirm: () => {
+            savedPagination.currentPage = 1;
+            setSavedActivities([]);
+            showToast(t('toastAllActivitiesCleared'), 'info');
+        }
+    });
 }
 
 function renderSavedActivitiesList() {
@@ -1776,20 +1860,32 @@ function finishWordSearchSelection() {
     renderWordSearchGrid();
 }
 
-/* Eventos táctiles delegados directamente sobre el contenedor #wsGrid para máxima fluidez móvil */
+/* Eventos táctiles delegados directamente sobre #wsGrid (soporta deslizar el dedo y también toque inicio + toque fin sin dejar la última letra pegada) */
 function initWordSearchTouchEvents() {
     const gridEl = document.getElementById('wsGrid');
     if (!gridEl) return;
 
+    let ignoreMouseUntil = 0;
+
+    // Bloquear mousedown/mouseenter sintéticos que el teléfono dispara después de tocar la pantalla
+    gridEl.addEventListener('mousedown', (e) => {
+        if (Date.now() < ignoreMouseUntil) {
+            e.stopPropagation();
+            e.preventDefault();
+        }
+    }, true);
+
     gridEl.addEventListener('touchstart', (e) => {
         if (appState.mode !== 'wordsearch') return;
+        ignoreMouseUntil = Date.now() + 1000;
+
         const touch = e.touches[0];
         if (!touch) return;
         const cell = getGridCellFromClientPoint(touch.clientX, touch.clientY);
         if (!cell) return;
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
 
-        // Soporte para modo toque-inicio y toque-fin en pantallas táctiles
+        // Si ya había una primera letra tocada (modo toque inicio + toque fin)
         if (appState.ws.tapStartCell && (appState.ws.tapStartCell.r !== cell.r || appState.ws.tapStartCell.c !== cell.c)) {
             const line = computeLineCells(appState.ws.tapStartCell.r, appState.ws.tapStartCell.c, cell.r, cell.c);
             if (line) {
@@ -1797,22 +1893,35 @@ function initWordSearchTouchEvents() {
                 appState.ws.isSelecting = true;
                 appState.ws.tapStartCell = null;
                 finishWordSearchSelection();
+                // Asegurar que no vuelva a seleccionarse la última letra al levantar el dedo
+                appState.ws.isSelecting = false;
+                appState.ws.tapStartCell = null;
+                appState.ws.selectedCells = [];
+                renderWordSearchGrid();
                 return;
             }
         }
 
+        // Iniciar selección sin destruir el DOM en touchstart (para que touchmove siga vivo en móvil)
         appState.ws.isSelecting = true;
         appState.ws.startCell = cell;
         appState.ws.currentCell = cell;
         appState.ws.selectedCells = [cell];
-        renderWordSearchGrid();
+
+        const targetDomCell = gridEl.querySelector(`[data-r="${cell.r}"][data-c="${cell.c}"]`);
+        if (targetDomCell) {
+            targetDomCell.classList.add('bg-indigo-600', 'text-white', 'scale-105');
+        }
     }, { passive: false });
 
     gridEl.addEventListener('touchmove', (e) => {
         if (appState.mode !== 'wordsearch' || !appState.ws.isSelecting) return;
+        ignoreMouseUntil = Date.now() + 1000;
+
         const touch = e.touches[0];
         if (!touch) return;
-        e.preventDefault();
+        if (e.cancelable) e.preventDefault();
+
         const cell = getGridCellFromClientPoint(touch.clientX, touch.clientY);
         if (cell) {
             onWsCellMouseEnter(cell.r, cell.c);
@@ -1820,8 +1929,11 @@ function initWordSearchTouchEvents() {
     }, { passive: false });
 
     gridEl.addEventListener('touchend', (e) => {
-        if (appState.mode === 'wordsearch' && appState.ws.isSelecting) {
-            e.preventDefault();
+        if (appState.mode !== 'wordsearch') return;
+        ignoreMouseUntil = Date.now() + 1000;
+        if (e.cancelable) e.preventDefault();
+
+        if (appState.ws.isSelecting) {
             finishWordSearchSelection();
         }
     }, { passive: false });
@@ -2799,3 +2911,19 @@ window.onload = function () {
     loadPreset('astronomia');
     renderSavedActivitiesList();
 };
+
+/* --- Receptor automático cuando corre dentro de UparApp Studio --- */
+if (window.self !== window.top || window.location.search.includes('suite=1')) {
+    const st = document.createElement('style');
+    st.textContent = `.brand-group, #appMainHeader .flex.items-center.gap-3:first-child, .app-header .header-top > div:first-child, #btnLangToggle, #btnThemeToggle, #langToggleBtn, #themeToggleBtn, footer, .app-footer, #appMainFooter { display: none !important; } .app-header .header-container, #appMainHeader > div { padding-top: 0.4rem !important; padding-bottom: 0.4rem !important; justify-content: center !important; } .subnav-bar { border-top: none !important; padding-top: 0 !important; }`;
+    document.head.appendChild(st);
+}
+window.addEventListener('message', (e) => {
+    if (e.data && e.data.type === 'UPAR_SUITE_SYNC') {
+        if (typeof appState === 'object') { appState.theme = e.data.theme; appState.lang = e.data.lang; }
+        if (typeof currentTheme !== 'undefined') currentTheme = e.data.theme;
+        if (typeof currentLang !== 'undefined') currentLang = e.data.lang;
+        if (typeof applyTheme === 'function') applyTheme();
+        if (typeof applyTranslations === 'function') applyTranslations();
+    }
+});

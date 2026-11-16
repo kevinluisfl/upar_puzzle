@@ -169,3 +169,47 @@ body.focus-mode #wsGridContainer {
         -webkit-print-color-adjust: exact;
     }
 }
+
+/* ==========================================================================
+   3. MENÚ SUPERIOR COMPACTO DE SOLO ÍCONOS EN MÓVIL (UPARPUZZLE)
+   ========================================================================== */
+@media (max-width: 639px) {
+    #appMainHeader > div {
+        flex-wrap: nowrap !important;
+        padding: 0.4rem 0.5rem !important;
+        gap: 0.35rem !important;
+        justify-content: space-between !important;
+    }
+
+    #appMainHeader .flex.bg-slate-100,
+    #appMainHeader .flex.bg-slate-800 {
+        padding: 0.2rem !important;
+        gap: 0.15rem !important;
+    }
+
+    #tabWordSearch,
+    #tabCrossword {
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.8rem !important;
+    }
+
+    #appMainHeader button[onclick="exportAsImage()"],
+    #appMainHeader button[onclick="handleCleanPrint()"] {
+        padding: 0.4rem 0.6rem !important;
+        font-size: 0.8rem !important;
+    }
+
+    #progressCounter {
+        white-space: nowrap;
+        font-size: 0.72rem;
+    }
+    #btnVerifyCrossword,
+    #btnHintCrossword,
+    button[onclick="regenerateCurrent()"],
+    #btnToggleSolution,
+    #btnFocusFullscreen,
+    button[onclick="resetCurrentSolve()"] {
+        padding: 0.45rem 0.6rem !important;
+        gap: 0 !important;
+    }
+}

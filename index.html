@@ -88,11 +88,11 @@
             <div class="flex bg-slate-100 dark:bg-slate-800 p-1.5 rounded-xl border border-slate-200/80 dark:border-slate-700">
                 <button id="tabWordSearch" onclick="switchMode('wordsearch')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all bg-white dark:bg-slate-900 text-indigo-600 dark:text-indigo-400 shadow-sm">
                     <i class="fa-solid fa-table-cells"></i>
-                    <span id="uiTabWS">Sopa de Letras</span>
+                    <span id="uiTabWS" class="hidden sm:inline">Sopa de Letras</span>
                 </button>
                 <button id="tabCrossword" onclick="switchMode('crossword')" class="flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-bold transition-all text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
                     <i class="fa-solid fa-puzzle-piece"></i>
-                    <span id="uiTabCW">Crucigrama</span>
+                    <span id="uiTabCW" class="hidden sm:inline">Crucigrama</span>
                 </button>
             </div>
 
@@ -387,31 +387,31 @@ COMETA" class="w-full p-2.5 rounded-lg border border-slate-200 dark:border-slate
                         <!-- Botón Verificar (Solo Crucigrama) -->
                         <button id="btnVerifyCrossword" onclick="verifyCrosswordProgress()" class="hidden px-3.5 py-2 rounded-xl bg-amber-50 dark:bg-amber-950/50 hover:bg-amber-100 dark:hover:bg-amber-900/60 text-amber-800 dark:text-amber-300 border border-amber-200 dark:border-amber-800 text-xs font-bold items-center gap-1.5 transition">
                             <i class="fa-solid fa-spell-check"></i>
-                            <span id="uiBtnVerify">Comprobar Letras</span>
+                            <span id="uiBtnVerify" class="hidden sm:inline">Comprobar Letras</span>
                         </button>
 
                         <!-- Botón Pista Rápida (Solo Crucigrama) -->
                         <button id="btnHintCrossword" onclick="revealActiveCellLetter()" class="hidden px-3.5 py-2 rounded-xl bg-sky-50 dark:bg-sky-950/50 hover:bg-sky-100 dark:hover:bg-sky-900/60 text-sky-700 dark:text-sky-300 border border-sky-200 dark:border-sky-800 text-xs font-bold items-center gap-1.5 transition" title="Revelar la letra de la casilla seleccionada">
                             <i class="fa-regular fa-lightbulb"></i>
-                            <span id="uiBtnHint">Dar Letra</span>
+                            <span id="uiBtnHint" class="hidden sm:inline">Dar Letra</span>
                         </button>
 
                         <!-- Botón Regenerar Disposición -->
                         <button onclick="regenerateCurrent()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-700 hover:to-violet-700 text-white text-xs font-bold shadow-sm shadow-indigo-500/20 flex items-center gap-1.5 transition transform active:scale-[0.99]">
                             <i class="fa-solid fa-arrows-rotate"></i>
-                            <span id="uiBtnRegenerate">Regenerar Disposición</span>
+                            <span id="uiBtnRegenerate" class="hidden sm:inline">Regenerar Disposición</span>
                         </button>
 
                         <!-- Botón Mostrar/Ocultar Solución -->
                         <button id="btnToggleSolution" onclick="toggleSolution()" class="px-3.5 py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 transition">
                             <i class="fa-regular fa-eye" id="solutionIcon"></i>
-                            <span id="solutionBtnText">Mostrar Solución</span>
+                            <span id="solutionBtnText" class="hidden sm:inline">Mostrar Solución</span>
                         </button>
 
                         <!-- Botón Pantalla Completa / Modo Concentración (TV / Video Beam) -->
                         <button id="btnFocusFullscreen" onclick="toggleFocusFullscreen()" class="px-3.5 py-2 rounded-xl border border-indigo-200 dark:border-indigo-800 bg-indigo-50/80 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/70 text-indigo-700 dark:text-indigo-300 text-xs font-bold flex items-center gap-1.5 transition" title="Modo Concentración / Pantalla Completa para proyectar">
                             <i id="focusFullscreenIcon" class="fa-solid fa-expand"></i>
-                            <span id="uiBtnFocusMode">Concentración</span>
+                            <span id="uiBtnFocusMode" class="hidden sm:inline">Concentración</span>
                         </button>
 
                         <!-- Botón Reiniciar Tablero -->
@@ -458,7 +458,7 @@ COMETA" class="w-full p-2.5 rounded-lg border border-slate-200 dark:border-slate
                             <p id="activeClueText" class="text-xs sm:text-sm font-semibold text-indigo-950 dark:text-indigo-200">Haz clic en cualquier casilla del crucigrama para escribir y ver su pista.</p>
                         </div>
                         <button onclick="toggleCrosswordDirection()" class="px-2.5 py-1.5 rounded-lg bg-white dark:bg-slate-800 hover:bg-indigo-100 dark:hover:bg-slate-700 text-indigo-700 dark:text-indigo-300 border border-indigo-200 dark:border-indigo-700 text-xs font-bold shrink-0 transition" title="Cambiar orientación Horizontal/Vertical">
-                            <i class="fa-solid fa-arrows-up-down-left-right mr-1"></i> <span id="uiBtnRotate">Girar</span>
+                            <i class="fa-solid fa-arrows-up-down-left-right mr-1"></i> <span id="uiBtnRotate" class="hidden sm:inline">Girar</span>
                         </button>
                     </div>
 
