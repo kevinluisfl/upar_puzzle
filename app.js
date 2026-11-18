@@ -2908,8 +2908,10 @@ window.onload = function () {
     applyTranslations();
     initWordSearchTouchEvents();
     initMobileCrosswordKeyboard();
-    loadPreset('astronomia');
     renderSavedActivitiesList();
+    setTimeout(() => {
+        loadPreset('astronomia');
+    }, 60);
 };
 
 /* --- Receptor automático cuando corre dentro de UparApp Studio --- */
