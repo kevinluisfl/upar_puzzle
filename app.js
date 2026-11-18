@@ -2914,6 +2914,21 @@ window.onload = function () {
     }, 60);
 };
 
+// window.onload = function () {
+//     applyTheme();
+//     applyTranslations();
+//     initWordSearchTouchEvents();
+//     initMobileCrosswordKeyboard();
+//     renderSavedActivitiesList();
+//     setTimeout(() => {
+//         if ('requestIdleCallback' in window) {
+//             requestIdleCallback(() => loadPreset('astronomia'));
+//         } else {
+//             loadPreset('astronomia');
+//         }
+//     }, 500);
+// };
+
 /* --- Receptor automático cuando corre dentro de UparApp Studio --- */
 if (window.self !== window.top || window.location.search.includes('suite=1')) {
     const st = document.createElement('style');
